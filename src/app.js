@@ -6,6 +6,10 @@ const bcrypt = require("bcryptjs");
 const cookieParser = require("cookie-parser");
 const Register = require("./models/registerModel");
 const auth = require("./middleware/auth");
+const bodyParser = require("body-parser");
+// const session = require("express-session");
+// const flash = require("connect-flash");
+const methodOverride = require("method-override");
 
 const app = express();
 require("./db/conn");
@@ -15,11 +19,19 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(methodOverride("_method"));
 
 app.use(express.static(path.join(__dirname, "../public")));
 app.set("views", path.join(__dirname, "../templates/views"));
 app.set("view engine", "hbs");
 hbs.registerPartials(path.join(__dirname, "../templates/partials"));
+
+const adminRoute = require("./admin");
+const pagesRoute = require("./pages");
+
+app.use("/admin",adminRoute);
+app.use("/admin/page/",pagesRoute);
 
 app.get("/", (req, res) => {
   res.render("index", {
@@ -75,8 +87,8 @@ app.post("/register", async (req, res) => {
       const token = await registerEmployee.generateAuthToken();
 
       res.cookie("jwt", token, {
-        expires: new Date(Date.now() + 60000),
-        httpOnly: true,
+        // expires: new Date(Date.now() + 60000),
+        httpOnly: true
       });
 
       const registerd = await registerEmployee.save();
@@ -105,8 +117,9 @@ app.post("/login", async (req, res) => {
     const token = await user.generateAuthToken();
 
     res.cookie("jwt", token, {
-      expires: new Date(Date.now() + 600000),
+      // expires: new Date(Date.now() + 30000),
       httpOnly: true,
+      sameSite: "none"
     });
 
     if (password) {
@@ -122,19 +135,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// const jwt = require("jsonwebtoken");
-
-// const createToken = async ()=>{
-//   const token = await jwt.sign({_id:"63a55185ddace605fd06a057"}, "my-32-character-ultra-secure-and-ultra-long-secret",{
-//     expiresIn: "5 seconds"
-//   });
-//   console.log(token);
-
-//   const userVerification = jwt.verify(token,"my-32-character-ultra-secure-and-ultra-long-secret");
-//   console.log(userVerification);
-// }
-
-// createToken();
 
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);

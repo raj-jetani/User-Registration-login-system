@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "node src/app.js"
+    "build": "nodemon src/app.js"
   },
   "keywords": [],
   "author": "",

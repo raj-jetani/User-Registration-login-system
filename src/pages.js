@@ -26,8 +26,6 @@ const upload = multer({
 });
 
 const pageModel = require("../src/models/pageModel");
-// const pageModel = require("../public/images");
-// const customjs = require("../public/ckeditor");
 
 const router = express();
 

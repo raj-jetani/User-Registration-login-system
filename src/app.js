@@ -40,7 +40,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/secret", auth, (req, res) => {
-  console.log(req.cookies.jwt);
   res.render("secret");
 });
 
@@ -92,7 +91,7 @@ app.post("/register", async (req, res) => {
       });
 
       const registerd = await registerEmployee.save();
-      res.status(201).send("Account created");
+      res.status(201).redirect("/admin");
     } else {
       res.send("Passwords are not matching");
     }
@@ -118,15 +117,12 @@ app.post("/login", async (req, res) => {
 
     res.cookie("jwt", token, {
       // expires: new Date(Date.now() + 30000),
-      httpOnly: true,
-      sameSite: "none"
+      httpOnly: true
+      // sameSite: "none"
     });
 
     if (password) {
-      
-      res.status(201).render("index", {
-        username: user.name,
-      });
+      res.status(201).redirect("/admin");;
     } else {
       res.send("Invalid email or password");
     }
